@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HVR.EF.Loc
 {
-    // HEFLoc V0.1.9000
+    // HEFLoc V0.1.9001
     public class HaiEFLoc
     {
         private readonly string _root;
@@ -115,7 +115,7 @@ namespace HVR.EF.Loc
         public void EnumPropertyField<TEnum>(string localizationKey, SerializedProperty property)
         {
             var newValue = EditorGUILayout.Popup(new GUIContent(Text(localizationKey)), property.intValue, property.enumNames.Select(
-                (enumName, i) => LocalizeEnumName(typeof(TEnum).Name, enumName)).ToArray());
+                (enumName, i) => LocalizeEnumName(typeof(TEnum).FullName, enumName)).ToArray());
             if (newValue != property.intValue)
             {
                 property.intValue = newValue;
@@ -139,9 +139,10 @@ namespace HVR.EF.Loc
             return MissingLocalizationKeyPrefix + actualKey;
         }
 
-        public void Selector()
+        public void Selector(Func<HaiEFLoc> remakeLocalization)
         {
             EditorGUILayout.Separator();
+            EditorGUILayout.BeginHorizontal();
             var newSelected = EditorGUILayout.Popup(new GUIContent(LanguageLabel), _selected, _selector);
             if (newSelected != _selected)
             {
@@ -151,6 +152,11 @@ namespace HVR.EF.Loc
                 
                 EditorPrefs.SetString(LocalizationPrefs, requestedLanguage);
             }
+            if (GUILayout.Button(EditorGUIUtility.IconContent("d_Refresh"), GUILayout.Width(20)))
+            {
+                remakeLocalization.Invoke();
+            }
+            EditorGUILayout.EndHorizontal();
         }
     }
 
