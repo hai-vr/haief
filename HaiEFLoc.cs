@@ -1,3 +1,26 @@
+/*
+MIT License
+
+Copyright (c) 2026 Haï~ (@vr_hai github.com/hai-vr)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +30,11 @@ using UnityEngine;
 
 namespace HVR.EF.Loc
 {
-    // HEFLoc V0.1.9004
+    // HEFLoc V0.1.9005
+    //
+    /// <summary>
+    /// A self-contained localization tool, which will be copied into multiple of my packages.
+    /// </summary>
     public class HaiEFLoc
     {
         private readonly string _root;
@@ -22,6 +49,7 @@ namespace HVR.EF.Loc
         
         private int _selected;
         private readonly GUIContent[] _selector;
+        private string _attemptedToLoad;
 
         public HaiEFLoc(string root, string folder)
         {
@@ -61,8 +89,22 @@ namespace HVR.EF.Loc
             TryApplyRequestedLanguage(requestedLanguage);
         }
 
+        public void RefreshIfNecessary()
+        {
+            var requestedLanguage = EditorPrefs.GetString(LocalizationPrefs, "en");
+            if (requestedLanguage != _attemptedToLoad)
+            {
+                TryApplyRequestedLanguage(requestedLanguage);
+            }
+        }
+
         private void TryApplyRequestedLanguage(string requestedLanguage)
         {
+            // _attemptedToLoad is not necessarily the language that will be loaded; this happens when the loop below fails to resolve.
+            // We need this, as the requested language may be a language that a given tool does not have a localization file for, so that if
+            // that happens, we don't continuously attempt to load a localization that does not exist.
+            _attemptedToLoad = requestedLanguage;
+            
             for (var index = 0; index < _availableLanguages.Count; index++)
             {
                 var localizationData = _availableLanguages[index];
