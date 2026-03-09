@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HVR.EF.Loc
 {
-    // HEFLoc V0.1.9001
+    // HEFLoc V0.1.9002
     public class HaiEFLoc
     {
         private readonly string _root;
@@ -18,6 +18,7 @@ namespace HVR.EF.Loc
 
         private LocalizationData _loaded;
         private readonly List<LocalizationData> _availableLanguages = new();
+        private LocalizationData _defaultLanguage;
         
         private int _selected;
         private readonly GUIContent[] _selector;
@@ -33,7 +34,7 @@ namespace HVR.EF.Loc
                 .ToList();
 
             var requestedLanguage = EditorPrefs.GetString(LocalizationPrefs, "en");
-            
+
             foreach (var localizationPath in localizationPaths)
             {
                 var parsed = TryParsePathOrNull(localizationPath);
@@ -41,6 +42,7 @@ namespace HVR.EF.Loc
                 {
                     if (parsed.Language == "en")
                     {
+                        _defaultLanguage = parsed;
                         _availableLanguages.Insert(0, parsed);
                     }
                     else
@@ -48,6 +50,11 @@ namespace HVR.EF.Loc
                         _availableLanguages.Add(parsed);
                     }
                 }
+            }
+
+            if (_defaultLanguage == null)
+            {
+                Debug.LogError("(HaiEFLoc) No default language found.");
             }
 
             _selector = _availableLanguages.Select(data => new GUIContent(data.CleanName)).ToArray();
@@ -135,7 +142,7 @@ namespace HVR.EF.Loc
         private string DoLocalize(string actualKey)
         {
             if (_loaded.Data.TryGetValue(actualKey, out var value)) return value;
-            
+            if (_defaultLanguage.Data.TryGetValue(actualKey, out value)) return MissingLocalizationKeyPrefix + value;
             return MissingLocalizationKeyPrefix + actualKey;
         }
 
