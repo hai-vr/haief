@@ -30,7 +30,7 @@ using UnityEngine;
 
 namespace HVR.EF.Loc
 {
-    // HEFLoc V0.1.9005
+    // HEFLoc V0.1.9006
     //
     /// <summary>
     /// A self-contained localization tool, which will be copied into multiple of my packages.
@@ -101,8 +101,6 @@ namespace HVR.EF.Loc
         private void TryApplyRequestedLanguage(string requestedLanguage)
         {
             // _attemptedToLoad is not necessarily the language that will be loaded; this happens when the loop below fails to resolve.
-            // We need this, as the requested language may be a language that a given tool does not have a localization file for, so that if
-            // that happens, we don't continuously attempt to load a localization that does not exist.
             _attemptedToLoad = requestedLanguage;
             
             for (var index = 0; index < _availableLanguages.Count; index++)
@@ -137,7 +135,17 @@ namespace HVR.EF.Loc
                 Dictionary<string, string> data = new();
                 foreach (var (key, value) in ours["phrases"]!.ToObject<JObject>())
                 {
-                    data.Add($"phrases.{key}", value!.Value<string>());
+                    if (value!.Type == JTokenType.Object)
+                    {
+                        foreach (var (subkey, subvalue) in value!.ToObject<JObject>())
+                        {
+                            data.Add($"phrases.{key}.{subkey}", subvalue!.Value<string>());
+                        }
+                    }
+                    else
+                    {
+                        data.Add($"phrases.{key}", value!.Value<string>());
+                    }
                 }
                 foreach (var (enumKey, enumValues) in ours["enums"]!.ToObject<JObject>())
                 {
