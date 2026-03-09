@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace HVR.EF.Loc
 {
-    // HEFLoc V0.1.9003
+    // HEFLoc V0.1.9004
     public class HaiEFLoc
     {
         private readonly string _root;
@@ -129,39 +129,21 @@ namespace HVR.EF.Loc
             }
         }
         
-        public void LabelField(string localizationKey)
-        {
-            EditorGUILayout.LabelField(Text(localizationKey));
-        }
-
-        public void LabelField(string localizationKey, GUIStyle style)
-        {
-            EditorGUILayout.LabelField(Text(localizationKey), style);
-        }
-
-        public void LabelField(string localizationKey, GUIStyle style, params GUILayoutOption[] options)
-        {
-            EditorGUILayout.LabelField(Text(localizationKey), style, options);
-        }
-
-        public void LabelField(string localizationKey, params GUILayoutOption[] options)
-        {
-            EditorGUILayout.LabelField(Text(localizationKey), options);
-        }
-        
-        public void HelpBox(string localizationKey, MessageType messageType)
-        {
-            EditorGUILayout.HelpBox(Text(localizationKey), messageType);
-        }
-
-        public bool Button(string localizationKey)
-        {
-            return GUILayout.Button(Text(localizationKey));
-        }
+        public void LabelField(string localizationKey) => EditorGUILayout.LabelField(Text(localizationKey));
+        public void LabelField(string localizationKey, GUIStyle style) => EditorGUILayout.LabelField(Text(localizationKey), style);
+        public void LabelField(string localizationKey, GUIStyle style, params GUILayoutOption[] options) => EditorGUILayout.LabelField(Text(localizationKey), style, options);
+        public void LabelField(string localizationKey, params GUILayoutOption[] options) => EditorGUILayout.LabelField(Text(localizationKey), options);
+        public void HelpBox(string localizationKey, MessageType messageType) => EditorGUILayout.HelpBox(Text(localizationKey), messageType);
+        public bool Button(string localizationKey) => GUILayout.Button(Text(localizationKey));
 
         public string Text(string localizationKey)
         {
             return DoLocalize($"phrases.{localizationKey}");
+        }
+
+        public string Format(string localizationKey, params object[] format)
+        {
+            return string.Format(DoLocalize($"phrases.{localizationKey}"), format);
         }
 
         private string LocalizeEnumName(string enumType, string enumValue)
